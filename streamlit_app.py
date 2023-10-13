@@ -26,11 +26,16 @@ options = Options()
 options.add_argument('--disable-gpu')
 options.add_argument('--headless')
 options.add_argument("--no-sandbox")
+options.add_argument('--clear-previous-cache')
+options.add_argument('--clear-previous-session')
 options.add_experimental_option("detach", True)
 
 @st.cache_resource
 def get_driver():
-    return webdriver.Chrome(options=options)
+    driver = webdriver.Chrome(options=options)
+    driver.set_page_load_timeout(30)
+    return driver
+
 
 """
 with st.echo():
@@ -40,11 +45,7 @@ with st.echo():
     st.code(driver.page_source)
 """
 
-def load_javascript(url):
-    driver = get_driver()
-    driver.set_page_load_timeout(30)
-    driver.get(url)
-    return driver.page_source
+
 
 
 if 'Img Url' not in st.session_state:
@@ -65,7 +66,9 @@ wcapi = API(
 
 def routledge_scrape(url):
     try:
-        soup = BeautifulSoup(load_javascript(url), 'html.parser')
+        driver = get_driver()
+        driver.get(url)
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
 
         #Get meta tags
         meta_tags = soup.find_all('meta', attrs={'property': True})
