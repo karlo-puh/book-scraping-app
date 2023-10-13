@@ -2,6 +2,7 @@ import streamlit as st
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
+from selenium.common.exceptions import WebDriverException
 from webdriver_manager.chrome import ChromeDriverManager
 from collections import namedtuple
 from typing import Iterable
@@ -66,6 +67,12 @@ def routledge_scrape(url):
         driver.set_page_load_timeout(30)
         driver.get(url)
         soup = BeautifulSoup(driver.page_source, 'html.parser')
+    except WebDriverException as e:
+        # Handle the page crash
+        driver.refresh()
+        # Optionally, you can log the error for further investigation
+        print("Page crashed:", e)
+
 
         #Get meta tags
         meta_tags = soup.find_all('meta', attrs={'property': True})
@@ -126,9 +133,6 @@ def routledge_scrape(url):
             'Category': category
         }
         """
-    except requests.exceptions.RequestException as e:
-        print(f"Error: {e}")
-        return {'Error' : 'Invalid URL'}
 
     
 def wiley_scrape(url):
