@@ -1,6 +1,6 @@
 streamlit
+woocommerce
 seleniumbase
 webdriver-manager
 beautifulsoup4
-WooCommerce
 psutil
