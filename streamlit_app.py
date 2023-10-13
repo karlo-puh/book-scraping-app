@@ -18,6 +18,9 @@ from woocommerce import API
 import psutil
 from bs4 import BeautifulSoup
 
+months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+st.set_page_config(layout="wide")
+
 # Options for Chrome driver
 options = Options()
 options.add_argument('--disable-gpu')
@@ -29,32 +32,19 @@ options.add_experimental_option("detach", True)
 def get_driver():
     return webdriver.Chrome(options=options)
 
+"""
 with st.echo():
     driver = get_driver()
     driver.get("http://example.com")
 
     st.code(driver.page_source)
-
-
-@st.cache_resource
-def get_driver():
-    return webdriver.Chrome(service = Service(ChromeDriverManager().install()), options = opts)
-
-opts = webdriver.ChromeOptions()
-opts.add_argument('--headless')
-opts.binary_location = '/usr/bin/google-chrome'
+"""
 
 def load_javascript(url):
-    print("Chrome Binary Path:", opts.binary_location)
-    print("ChromeDriver Path:", shutil.which('chromedriver'))  # You may need to import the 'which' function
     driver = get_driver()
-
+    driver.set_page_load_timeout(30)
     driver.get(url)
-    driver.implicitly_wait(2)
-    page_source = driver.page_source
-
-    driver.quit()
-    return page_source
+    return driver.page_source
 
 
 if 'Img Url' not in st.session_state:
@@ -63,9 +53,6 @@ if 'Img Url' not in st.session_state:
 if 'Dimensions' not in st.session_state:                   
     st.session_state['Dimensions'] = "20x30"
 
-
-months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
-st.set_page_config(layout="wide")
 
 wcapi = API(
     url="https://www.strucnaliteratura.hr",
@@ -79,18 +66,17 @@ wcapi = API(
 def routledge_scrape(url):
     try:
         soup = BeautifulSoup(load_javascript(url), 'html.parser')
-        print(soup)
-        print("not working")
 
-        """
+        #Get meta tags
         meta_tags = soup.find_all('meta', attrs={'property': True})
 
         for meta in meta_tags:
             if meta['property'] == 'product:price:amount':
-                print(meta['content'])
+                print("Price: " + meta['content'])
+            if meta['property'] == 'product:price:currency':
+                print("Currency: " + meta['content'])
 
-        price = meta_tags.find()
-        
+        """
         # Extracting Title and Subtitle
         title_with_subtitle = soup.find('h1', class_='visible-xs').text.strip()
         title_parts = title_with_subtitle.split(':')
