@@ -26,15 +26,11 @@ options = Options()
 options.add_argument('--disable-gpu')
 options.add_argument('--headless')
 options.add_argument("--no-sandbox")
-options.add_argument('--clear-previous-cache')
-options.add_argument('--clear-previous-session')
 options.add_experimental_option("detach", True)
 
 @st.cache_resource
 def get_driver():
-    driver = webdriver.Chrome(options=options)
-    driver.set_page_load_timeout(30)
-    return driver
+    return webdriver.Chrome(options=options)
 
 
 """
@@ -67,6 +63,7 @@ wcapi = API(
 def routledge_scrape(url):
     try:
         driver = get_driver()
+        driver.set_page_load_timeout(30)
         driver.get(url)
         soup = BeautifulSoup(driver.page_source, 'html.parser')
 
